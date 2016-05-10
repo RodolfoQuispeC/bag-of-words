@@ -1,3 +1,4 @@
+This is based on https://github.com/bikz05/bag-of-words, runs with opencv 3 opencv_contriba and SIFT/SURF
 # bag-of-words
 ![alt text](docs/images/bog.png)
 Python Implementation of Bag of Words for Image Recognition using OpenCV and
