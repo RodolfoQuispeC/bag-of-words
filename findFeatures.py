@@ -6,7 +6,7 @@ import imutils
 import numpy as np
 
 import os
-from sklearn.svm import LinearSVC
+from sklearn.svm import LinearSVC, SVC
 from sklearn.externals import joblib
 from scipy.cluster.vq import *
 from sklearn.preprocessing import StandardScaler
@@ -71,7 +71,8 @@ stdSlr = StandardScaler().fit(im_features)
 im_features = stdSlr.transform(im_features)
 
 # Train the Linear SVM
-clf = LinearSVC()
+#clf = LinearSVC()
+clf = SVC(C = 100, kernel='rbf')
 clf.fit(im_features, np.array(image_classes))
 
 # Save the SVM
