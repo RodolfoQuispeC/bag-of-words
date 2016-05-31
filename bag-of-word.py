@@ -10,15 +10,15 @@ from sklearn.svm import LinearSVC, SVC
 from sklearn.externals import joblib
 from scipy.cluster.vq import *
 from sklearn.preprocessing import StandardScaler
-
+from sklearn import cross_validation
 
 # Get the path of the training set
 parser = ap.ArgumentParser()
-parser.add_argument("-t", "--trainingSet", help="Path to Training Set", required="True")
+parser.add_argument("-d", "--dataset", help="Path to dataset", required="True")
 args = vars(parser.parse_args())
 
 # Get the training classes names and store them in a list
-train_path = args["trainingSet"]
+train_path = args["dataset"]
 training_names = os.listdir(train_path)
 
 # Get all the path to the images and save them in a list
@@ -70,11 +70,27 @@ idf = np.array(np.log((1.0*len(image_paths)+1) / (1.0*nbr_occurences + 1)), 'flo
 stdSlr = StandardScaler().fit(im_features)
 im_features = stdSlr.transform(im_features)
 
+print im_features
+print im_features.shape
+print np.array(image_classes)
+print (np.array(image_classes)).shape
+print "----------------------------------------------"
 # Train the Linear SVM
 #clf = LinearSVC()
-clf = SVC(C = 100, kernel='rbf')
-clf.fit(im_features, np.array(image_classes))
+#clf = SVC(C = 100, kernel='rbf')
+#clf.fit(im_features, np.array(image_classes))
+
+
+#clf = SVC(C = 100, kernel='rbf')
+#scores = cross_validation.cross_val_score(clf, im_features, np.array(image_classes), cv=4)
+#print scores
+# output: 0.71428571  0.67857143  0.45833333  0.5  
+
+X_train, X_test, y_train, y_test = cross_validation.train_test_split(im_features, np.array(image_classes), test_size=0.26, random_state=0)
+clf = SVC(C = 100, kernel='rbf').fit(X_train, y_train)
+scores = clf.score(X_test, y_test) 
+print scores
 
 # Save the SVM
-joblib.dump((clf, training_names, stdSlr, k, voc), "surf_fm_trained.pkl", compress=3)    
+#joblib.dump((clf, training_names, stdSlr, k, voc), "surf_fm_trained.pkl", compress=3)    
     
