@@ -42,25 +42,32 @@ if __name__ == '__main__':
         class_id+=1
     
     # Create feature extraction and keypoint detector objects
-    #sift = cv2.xfeatures2d.SIFT_create()
-    surf = cv2.xfeatures2d.SURF_create()
+    sift = cv2.xfeatures2d.SIFT_create()
+    #surf = cv2.xfeatures2d.SURF_create()
     
     # List where all the descriptors are stored
     des_list = []
-    
-    for image_path in image_paths:
+    i = 1
+    tmp_image_paths = image_paths
+    image_paths = []
+    tmp_image_classes = image_classes
+    image_classes = []
+    for image_path, image_class in zip(tmp_image_paths, tmp_image_classes):
         im = cv2.imread(image_path)
-        #kpts, des = sift.detectAndCompute(im, None)
-        kpts, des = surf.detectAndCompute(im, None)
-        des_list.append((image_path, des))   
-        
+        kpts, des = sift.detectAndCompute(im, None)
+        #kpts, des = surf.detectAndCompute(im, None)
+        if(des != None):
+            des_list.append((image_path, des))
+            image_paths.append(image_path)
+            image_classes.append(image_class)
+
     # Stack all the descriptors vertically in a numpy array
     descriptors = des_list[0][1]
     for image_path, descriptor in des_list[1:]:
         descriptors = np.vstack((descriptors, descriptor))  
     
     # Perform k-means clustering
-    k = 100
+    k = 500
     voc, variance = kmeans(descriptors, k, 1) 
         
     # Calculate the histogram of features
@@ -101,10 +108,10 @@ if __name__ == '__main__':
     print scores
     """
     
-    X_train, X_test, y_train, y_test = cross_validation.train_test_split(im_features, np.array(image_classes), test_size=0.26, random_state=0)
+    X_train, X_test, y_train, y_test = cross_validation.train_test_split(im_features, np.array(image_classes), test_size=0.05, random_state=0)
     gamma_range = np.power (10., np.arange (-5, 5, 0.5));
     C_range = np.power (10., np.arange (-5, 5));
-    grid_search_params_SVC = \
+    grid_search_params = \
       [{'kernel' : ['rbf'], 'C' : C_range, 'gamma' : gamma_range},\
        {'kernel' : ['linear'], 'C' : C_range}];
     
